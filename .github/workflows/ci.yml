@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ── Smart Contract CI ──────────────────────────────────────────────────────
+  contracts:
+    name: Smart Contracts (test + build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+          components: clippy, rustfmt
+
+      - name: Cache Cargo build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: contracts
+
+      - name: Build WASM (wasm32v1-none, release)
+        working-directory: contracts
+        run: cargo build --workspace --release --target wasm32v1-none
+
+      - name: Run contract tests
+        working-directory: contracts
+        run: cargo test --workspace
+
+      - name: Lint (clippy)
+        working-directory: contracts
+        run: cargo clippy --workspace -- -D warnings
+
+      - name: Format check
+        working-directory: contracts
+        run: cargo fmt --all -- --check
+
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-wasms
+          path: contracts/target/wasm32v1-none/release/*.wasm
+          if-no-files-found: warn
+
+  # ── Chain SDK CI ───────────────────────────────────────────────────────────
+  chain:
+    name: Chain SDK (build + test)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: chain/package-lock.json
+
+      - name: Install dependencies
+        working-directory: chain
+        run: npm ci
+
+      - name: Build
+        working-directory: chain
+        run: npm run build
+
+      - name: Type check
+        working-directory: chain
+        run: npm run typecheck
+
+      - name: Run unit tests
+        working-directory: chain
+        run: npm test
+
+  # ── Backend CI ─────────────────────────────────────────────────────────────
+  backend:
+    name: Backend (build + test)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: |
+            chain/package-lock.json
+            backend/package-lock.json
+
+      # The backend depends on @giffy/chain (file:../chain), which publishes only
+      # its compiled dist/ — so the SDK must be installed and built before the
+      # backend's own `npm ci` packs it.
+      - name: Install & build chain SDK
+        working-directory: chain
+        run: npm ci && npm run build
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Type check
+        working-directory: backend
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: backend
+        run: npm run build
+
+      - name: Run tests
+        working-directory: backend
+        run: npm test
+
+  # ── Frontend CI ────────────────────────────────────────────────────────────
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Type check
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://giffy-h3q3.onrender.com/api
+          NEXT_PUBLIC_HORIZON_URL: https://horizon-testnet.stellar.org
+          NEXT_PUBLIC_STELLAR_NETWORK: TESTNET
+          NEXT_PUBLIC_GIFT_ESCROW_CONTRACT_ID: CCABIQYBL53CPLZLXCDNG4TQ54RUCWHZJXFLCROETVU3LGGXQZXZUWT4
+          NEXT_PUBLIC_ANCHOR_HOME_DOMAIN: testanchor.stellar.org
+        run: npm run build
+
+      - name: Upload Next.js build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: frontend/.next
+          include-hidden-files: true
+          if-no-files-found: warn
