@@ -1,6 +1,8 @@
 # 🎁 Giffy — Send Crypto as a Gift Link, with an Optional Zero-Knowledge Seal
 
 <div align="center">
+<img width="2845" height="1567" alt="Screenshot from 2026-07-19 13-58-10" src="https://github.com/user-attachments/assets/fb43d6df-a7ae-4e71-a049-dde4a9eaeee4" />
+    
 <img src="https://img.shields.io/badge/Stellar-Soroban-7B2FBE?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Rust-1.95-red?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge" />
