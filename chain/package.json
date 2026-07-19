@@ -1,0 +1,39 @@
+{
+  "name": "@giffy/chain",
+  "version": "1.0.0",
+  "description": "Giffy on-chain interaction layer: the gift-escrow Soroban contract client, classic trustline management, and SEP-1/10/24 anchor protocol clients.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:integration": "vitest run --project integration"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^16.0.1",
+    "dotenv": "16.4.7",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.5",
+    "typescript": "5.7.3",
+    "vitest": "4.1.10"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
