@@ -22,7 +22,7 @@
 
 ---
 
-## 🚀 Deployed Contracts (Stellar Testnet)
+## Deployed Contracts (Stellar Testnet)
 
 **Network:** Stellar Testnet · Passphrase `Test SDF Network ; September 2015`
 
@@ -120,10 +120,7 @@ See [§21](#21-cicd-pipeline) for the full job breakdown.
 |---|---|
 | 🚀 **Live app (Vercel)** | **https://giffy-chi-coral.vercel.app/** |
 | 🛰️ **Live API (Render)** | **https://giffy-h3q3.onrender.com** · [health](https://giffy-h3q3.onrender.com/api/health) |
-| Local frontend | `http://localhost:3000` (see [§19](#19-xlm--usdc--sealed-pool-testnet-setup) / [§22](#22-deployment--rollback)) |
-| Local backend API | `http://localhost:4000/api` |
-| gift-escrow explorer | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CCABIQYBL53CPLZLXCDNG4TQ54RUCWHZJXFLCROETVU3LGGXQZXZUWT4) |
-| shielded-pool explorer | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CDDF4SNZ6LRAZURFG37SAZQBDHD4S6DTOIQVAQZMLREIQNU2V77RXGS6) |
+| **Demo Video** | [Youtube Link](https://giffy-chi-coral.vercel.app/) |
 
 ---
 
@@ -131,29 +128,13 @@ See [§21](#21-cicd-pipeline) for the full job breakdown.
 
 Giffy's frosted-glass UI is fully responsive — it reflows from desktop down to phone widths (navbar, gift wizard, dashboard, and claim/wallet pages all adapt). Add mobile screenshots below.
 
-<!--
-  HOW TO ADD MOBILE SCREENSHOTS
-  ────────────────────────────
-  Option A (easiest — GitHub-hosted): open any issue/PR on this repo, drag-drop the
-  image into the comment box, and GitHub gives you a
-  https://github.com/user-attachments/assets/... URL. Paste it into a src="" below.
-
-  Option B (committed to the repo): save files under docs/screenshots/ and reference
-  them relatively, e.g. src="docs/screenshots/mobile-home.png".
-
-  Recommended: ~390×844 (iPhone) or ~360×800 (Android) frames, shown at width≈250.
-  Replace each REPLACE_WITH_SCREENSHOT_URL placeholder below.
--->
-
 <div align="center">
-
-| Home | Create a Gift | Claim | Wallet |
-|:---:|:---:|:---:|:---:|
-| <img width="240" alt="Giffy home — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> | <img width="240" alt="Create a gift — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> | <img width="240" alt="Claim a gift — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> | <img width="240" alt="Wallet — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> |
-
+  <img
+    src="https://github.com/user-attachments/assets/3197ac44-aacb-4e36-b75a-62b238d10fa1"
+    alt="Screenshot from 2026-07-19 13-58-59"
+    width="280"
+  />
 </div>
-
-> _Placeholders above — drop your mobile screenshots in and delete this note._
 
 ---
 
