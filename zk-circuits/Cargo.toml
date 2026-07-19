@@ -1,0 +1,26 @@
+[package]
+name = "zk-circuits"
+version = "0.1.0"
+edition = "2021"
+
+# Phase 2 vertical slice for ZK-sealed gift amounts: a real Groth16 circuit that
+# proves Merkle membership of a note commitment + derives its nullifier, using a
+# Poseidon2 gadget that matches the on-chain `shielded-pool::poseidon` byte-for-
+# byte. Native-only (proof generation + trusted setup); it emits a fixture that
+# is verified on the deployed on-chain Groth16 verifier. See README.md.
+#
+# Deliberately OUTSIDE the soroban `contracts/` workspace: this is host proving
+# code, never compiled to wasm.
+
+[dependencies]
+ark-bls12-381 = { version = "0.4.0", features = ["curve"] }
+ark-ff = "0.4.2"
+ark-ec = "0.4.2"
+ark-std = "0.4.0"
+ark-relations = "0.4.0"
+ark-r1cs-std = "0.4.0"
+ark-groth16 = "0.4.0"
+ark-snark = "0.4.0"
+
+[dev-dependencies]
+ark-serialize = "0.4.2"
