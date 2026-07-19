@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  // `rootDir` lives here rather than in the base config, which also covers `test/`:
+  // pinning it there would make `tsc --noEmit` reject every test file for sitting
+  // outside it. The build itself compiles only `src`, so `dist/` stays flat.
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

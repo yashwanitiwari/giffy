@@ -1,0 +1,42 @@
+{
+  "name": "@giffy/backend",
+  "version": "1.0.0",
+  "description": "Giffy REST API: gift lifecycle, claim links, SEP-24 on-ramp sessions, and the refund sweep.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@giffy/chain": "file:../chain",
+    "cors": "2.8.5",
+    "dotenv": "16.4.7",
+    "express": "5.1.0",
+    "express-rate-limit": "7.5.0",
+    "helmet": "8.0.0",
+    "mongoose": "8.24.1",
+    "node-cron": "4.2.1",
+    "pino": "9.6.0",
+    "pino-http": "10.4.0",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@stellar/stellar-sdk": "^16.0.1",
+    "@types/cors": "2.8.17",
+    "@types/express": "5.0.0",
+    "@types/node": "22.10.5",
+    "pino-pretty": "13.0.0",
+    "tsx": "4.23.1",
+    "typescript": "5.7.3",
+    "vitest": "4.1.10"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
