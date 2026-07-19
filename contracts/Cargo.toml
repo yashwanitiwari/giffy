@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = [
+    "gift-escrow",
+    "groth16-verifier",
+    "shielded-pool",
+]
+
+[workspace.package]
+edition = "2021"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
