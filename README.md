@@ -12,6 +12,12 @@
 
 **Send crypto the way you'd send an e-gift card — a link, a message, and a claim button. Every gift lives inside one Soroban contract from creation through claim or refund. Optionally, the amount itself never touches the chain in the clear: it's sealed into a zero-knowledge shielded pool and proven, not revealed, at claim time.**
 
+### 🔗 Live Demo
+
+**[▶️ Launch Giffy (Vercel)](https://giffy-chi-coral.vercel.app/)** &nbsp;·&nbsp; **[Backend API (Render)](https://giffy-h3q3.onrender.com)** &nbsp;·&nbsp; **[API Health](https://giffy-h3q3.onrender.com/api/health)**
+
+*Live on Stellar **Testnet** — no real funds are handled. Bring a [Freighter](https://freighter.app) wallet switched to Testnet.*
+
 </div>
 
 ---
@@ -68,7 +74,12 @@ Contract IDs are wired through `backend/.env` (`GIFT_ESCROW_CONTRACT_ID`, `SHIEL
 
 ### CI/CD
 
-There is currently **no CI/CD pipeline configured** for this repository (no `.github/workflows/`, and the project directory is not yet a git repository). All test/typecheck/build commands below are run manually; see [§21](#21-cicd-pipeline) for exactly what a CI pipeline should run once one is added.
+CI/CD runs on **GitHub Actions** ([`.github/workflows/`](.github/workflows)):
+
+- **`ci.yml`** — on every push & PR: contracts (`cargo fmt --check` · `clippy -D warnings` · `cargo test` · wasm build), chain SDK (build · typecheck · test), backend (build · typecheck · test), frontend (lint · typecheck · build).
+- **`deploy.yml`** — on push to `main`: redeploys the **backend to [Render](https://giffy-h3q3.onrender.com)** and the **frontend to [Vercel](https://giffy-chi-coral.vercel.app/)**. Smart-contract deployment is **manual-only** (opt-in `workflow_dispatch`), so a push never redeploys the on-chain contracts.
+
+See [§21](#21-cicd-pipeline) for the full job breakdown.
 
 ---
 
@@ -107,10 +118,42 @@ There is currently **no CI/CD pipeline configured** for this repository (no `.gi
 
 | Resource | Link |
 |---|---|
+| 🚀 **Live app (Vercel)** | **https://giffy-chi-coral.vercel.app/** |
+| 🛰️ **Live API (Render)** | **https://giffy-h3q3.onrender.com** · [health](https://giffy-h3q3.onrender.com/api/health) |
 | Local frontend | `http://localhost:3000` (see [§19](#19-xlm--usdc--sealed-pool-testnet-setup) / [§22](#22-deployment--rollback)) |
 | Local backend API | `http://localhost:4000/api` |
 | gift-escrow explorer | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CCABIQYBL53CPLZLXCDNG4TQ54RUCWHZJXFLCROETVU3LGGXQZXZUWT4) |
 | shielded-pool explorer | [stellar.expert](https://stellar.expert/explorer/testnet/contract/CDDF4SNZ6LRAZURFG37SAZQBDHD4S6DTOIQVAQZMLREIQNU2V77RXGS6) |
+
+---
+
+## 📱 Mobile / Responsive Views
+
+Giffy's frosted-glass UI is fully responsive — it reflows from desktop down to phone widths (navbar, gift wizard, dashboard, and claim/wallet pages all adapt). Add mobile screenshots below.
+
+<!--
+  HOW TO ADD MOBILE SCREENSHOTS
+  ────────────────────────────
+  Option A (easiest — GitHub-hosted): open any issue/PR on this repo, drag-drop the
+  image into the comment box, and GitHub gives you a
+  https://github.com/user-attachments/assets/... URL. Paste it into a src="" below.
+
+  Option B (committed to the repo): save files under docs/screenshots/ and reference
+  them relatively, e.g. src="docs/screenshots/mobile-home.png".
+
+  Recommended: ~390×844 (iPhone) or ~360×800 (Android) frames, shown at width≈250.
+  Replace each REPLACE_WITH_SCREENSHOT_URL placeholder below.
+-->
+
+<div align="center">
+
+| Home | Create a Gift | Claim | Wallet |
+|:---:|:---:|:---:|:---:|
+| <img width="240" alt="Giffy home — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> | <img width="240" alt="Create a gift — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> | <img width="240" alt="Claim a gift — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> | <img width="240" alt="Wallet — mobile" src="REPLACE_WITH_SCREENSHOT_URL" /> |
+
+</div>
+
+> _Placeholders above — drop your mobile screenshots in and delete this note._
 
 ---
 
@@ -753,14 +796,26 @@ cd frontend && npm run lint        # eslint (next lint)
 
 ## 21. CI/CD Pipeline
 
-**Not yet configured** — there is no `.github/workflows/` directory in this repository, and the project is not currently under git version control. If/when CI is added, it should mirror what's already run manually and documented in [§20](#20-testing--run--outputs):
+Configured via **GitHub Actions** in [`.github/workflows/`](.github/workflows).
+
+### `ci.yml` — on every push and pull request
 
 | Job | Steps |
 |---|---|
-| **contracts** | `cargo fmt --check` → `cargo test --workspace` → `stellar contract build` (all 3 packages) → upload wasm artifacts |
-| **zk** | `cargo test` in `zk-circuits` and `zk-prover-wasm` (native measurement, not the full wasm-pack browser build, to keep CI fast) |
-| **backend** | `npm ci` → `npm run typecheck` → `npm test` |
-| **frontend** | `npm ci` → `npm run typecheck` → `npm run lint` → `npm run build` |
+| **contracts** | `cargo build --release --target wasm32v1-none` → `cargo test --workspace` → `cargo clippy -- -D warnings` → `cargo fmt --all --check` → upload wasm artifacts |
+| **chain** | `npm ci` → `npm run build` → `npm run typecheck` → `npm test` (unit) |
+| **backend** | build `@giffy/chain` first (it's a `file:../chain` dep) → `npm ci` → `npm run typecheck` → `npm run build` → `npm test` |
+| **frontend** | `npm ci` → `npm run lint` → `npm run typecheck` → `npm run build` → upload `.next` |
+
+### `deploy.yml` — on push to `main`
+
+| Job | What it does |
+|---|---|
+| **deploy-contract** (Stellar testnet) | Runs on every push (shows green ✓) but **only actually deploys on an opt-in manual `workflow_dispatch`** with `deploy_contracts=true` + `STELLAR_SECRET_KEY` — a normal push never redeploys the contracts. |
+| **deploy-backend** ([Render](https://giffy-h3q3.onrender.com)) | Triggers a Render deploy via the Render API; rewrites the contract-address env vars only when contracts were just redeployed. |
+| **deploy-frontend** ([Vercel](https://giffy-chi-coral.vercel.app/)) | Runs `vercel deploy --prod`, falling back to the live contract address when contracts weren't redeployed this run. |
+
+Deploy jobs self-skip (and stay green) until their secrets are set: `RENDER_API_KEY` + `RENDER_SERVICE_ID`, `VERCEL_TOKEN` + `VERCEL_ORG_ID` + `VERCEL_PROJECT_ID`, and — only for manual contract deploys — `STELLAR_SECRET_KEY`.
 
 ---
 
@@ -777,7 +832,14 @@ stellar contract deploy --wasm target/wasm32v1-none/release/shielded_pool.wasm -
 stellar contract invoke --id <POOL_ID> --source deployer --network testnet -- initialize --config '{...}' --vk '{...}'
 ```
 
-### Backend + Frontend (local / self-hosted)
+### Backend + Frontend (hosted)
+- **Frontend → [Vercel](https://giffy-chi-coral.vercel.app/):** project Root Directory `frontend`, framework auto-detected (Next.js). Deploys on push to `main` (native Vercel Git integration and/or `deploy.yml`). `NEXT_PUBLIC_*` env vars are set in the Vercel dashboard.
+- **Backend → [Render](https://giffy-h3q3.onrender.com):** Web Service that builds `@giffy/chain` before `backend` (the backend depends on `file:../chain`):
+  - **Build:** `npm install --include=dev --prefix chain && npm run build --prefix chain && npm install --include=dev --prefix backend && npm run build --prefix backend`
+  - **Start:** `npm start --prefix backend`
+  - Requires a **MongoDB** (Atlas) via `MONGODB_URI`, and `CORS_ORIGIN` pointed at the Vercel URL.
+
+### Backend + Frontend (local dev)
 ```bash
 cd backend && npm install && npm run dev     # http://localhost:4000
 cd frontend && npm install && npm run dev    # http://localhost:3000
@@ -786,7 +848,7 @@ Both read their contract ids from `.env` / `.env.local` (see [§23](#23-environm
 
 ### Rollback
 - **Contracts:** Soroban deploys are immutable per contract id. Roll back by re-pointing `GIFT_ESCROW_CONTRACT_ID` / `SHIELDED_POOL_CONTRACT_ID` at a previous known-good id and restarting the backend (and rebuilding the frontend for its `NEXT_PUBLIC_*` equivalents).
-- **Backend/Frontend:** no hosted deployment target is configured yet; both currently run as local dev processes.
+- **Backend/Frontend:** redeploy a previous commit from the [Render](https://giffy-h3q3.onrender.com) / [Vercel](https://giffy-chi-coral.vercel.app/) dashboards (both keep deploy history), or re-run `deploy.yml` from the Actions tab.
 
 ### Verification
 After (re)starting: `GET /api/health` → `{"status":"ok","db":"connected"}`; `GET /api/pool/info` → 200 with the pool id if sealed gifts are enabled; open `/create`, compose a gift, and drive a claim through `/claim/[token]` (or `/claim/sealed` for a sealed gift) to confirm the full chain.
@@ -873,7 +935,7 @@ After (re)starting: `GET /api/health` → `{"status":"ok","db":"connected"}`; `G
 
 | Limitation | Impact | Roadmap |
 |---|---|---|
-| No CI/CD configured | Manual test/build verification only | Add the pipeline described in §21 once the repo is under git. |
+| Render free tier cold starts | Backend sleeps after ~15 min idle; the first request after sleep is slow and the refund/reconciliation/indexer crons pause while asleep | Upgrade to a paid Render instance, or run a separate always-on worker/uptime ping so the crons execute continuously. |
 | Sealed pool: single fixed denomination (10 XLM) | Can't seal arbitrary amounts | Proof-based deposit (§5.4) unlocks arbitrary tree depth; a join-split circuit would unlock arbitrary amounts. |
 | Sealed pool: placeholder Poseidon2 constants, non-audited | Not safe for real value | See the full list in §5.9 / §17.2 — this is the single biggest pre-launch gate. |
 | Pool contract error messages | Cosmetically wrong (mapped through gift-escrow's table) | Add a pool-specific `ChainErrorCode` set in `chain/src/errors.ts`. |
