@@ -28,8 +28,9 @@ jobs:
   deploy-contract:
     name: Deploy contracts (Stellar testnet)
     runs-on: ubuntu-latest
-    # Contracts deploy only on an opt-in manual run — never on a push.
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_contracts }}
+    # This job RUNS on every push (so it shows a green ✓ like the other deploy
+    # jobs), but the actual `stellar contract deploy` below only fires on an
+    # opt-in manual run — a push never redeploys the contracts.
     outputs:
       gift_escrow: ${{ steps.addresses.outputs.gift_escrow }}
       shielded_pool: ${{ steps.addresses.outputs.shielded_pool }}
@@ -68,8 +69,17 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Contracts are only (re)deployed on an opt-in manual run — never on a
+          # push. On a push this exits 0 (job stays green) without deploying, and
+          # downstream services keep using the currently-live contract address.
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ inputs.deploy_contracts }}" != "true" ]; then
+            echo "::notice::Not an opt-in manual deploy — skipping contract deploy (contracts are not redeployed on pushes)."
+            echo "deployed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [ -z "$STELLAR_SECRET_KEY" ]; then
-            echo "::warning::STELLAR_SECRET_KEY not set — skipping contract deploy. Add it in repo Settings → Secrets and variables → Actions to enable this job."
+            echo "::warning::STELLAR_SECRET_KEY not set — cannot deploy. Add it in repo Settings → Secrets and variables → Actions to enable this job."
             echo "deployed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
