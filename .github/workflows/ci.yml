@@ -124,8 +124,21 @@ jobs:
         working-directory: backend
         run: npm run build
 
+      # The backend (and @giffy/chain) validate their config at import time, so
+      # the test process needs the required env vars present. These are dummy but
+      # schema-valid values — the unit tests do not open a real DB/network.
       - name: Run tests
         working-directory: backend
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://localhost:27017/giffy-test
+          STELLAR_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
+          SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
+          HORIZON_URL: https://horizon-testnet.stellar.org
+          GIFT_ESCROW_CONTRACT_ID: CCABIQYBL53CPLZLXCDNG4TQ54RUCWHZJXFLCROETVU3LGGXQZXZUWT4
+          ANCHOR_HOME_DOMAIN: testanchor.stellar.org
+          CLAIM_LINK_BASE_URL: http://localhost:3000/claim
+          CONTRIBUTE_LINK_BASE_URL: http://localhost:3000/gift
         run: npm test
 
   # ── Frontend CI ────────────────────────────────────────────────────────────

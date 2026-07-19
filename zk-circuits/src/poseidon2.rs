@@ -40,7 +40,11 @@ fn ext_mix(s: [Fr; 3]) -> [Fr; 3] {
 }
 fn int_mix(s: [Fr; 3]) -> [Fr; 3] {
     let sum = s[0] + s[1] + s[2];
-    [s[0] * diag(0) + sum, s[1] * diag(1) + sum, s[2] * diag(2) + sum]
+    [
+        s[0] * diag(0) + sum,
+        s[1] * diag(1) + sum,
+        s[2] * diag(2) + sum,
+    ]
 }
 
 /// Native 2-to-1 Poseidon2 compression.

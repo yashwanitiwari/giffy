@@ -67,7 +67,11 @@ fn gadget_matches_native_poseidon() {
         let av = FpVar::new_witness(cs.clone(), || Ok(af)).unwrap();
         let bv = FpVar::new_witness(cs.clone(), || Ok(bf)).unwrap();
         let got = hash2_var(&av, &bv).unwrap().value().unwrap();
-        assert_eq!(got, hash2(af, bf), "gadget vs native mismatch for ({a},{b})");
+        assert_eq!(
+            got,
+            hash2(af, bf),
+            "gadget vs native mismatch for ({a},{b})"
+        );
     }
     assert!(cs.is_satisfied().unwrap());
 }
@@ -94,8 +98,7 @@ fn withdraw_proof_valid_and_fixture_emitted() {
         siblings: None,
         index_bits: None,
     };
-    let (pk, vk) =
-        Groth16::<Bls12_381>::circuit_specific_setup(setup_circuit, &mut rng).unwrap();
+    let (pk, vk) = Groth16::<Bls12_381>::circuit_specific_setup(setup_circuit, &mut rng).unwrap();
 
     let proof = Groth16::<Bls12_381>::prove(&pk, circuit, &mut rng).unwrap();
 
@@ -115,7 +118,11 @@ fn withdraw_proof_valid_and_fixture_emitted() {
     );
 
     // Emit Soroban-format JSON for the on-chain verifier.
-    let ic: Vec<String> = vk.gamma_abc_g1.iter().map(|p| format!("\"{}\"", g1_hex(p))).collect();
+    let ic: Vec<String> = vk
+        .gamma_abc_g1
+        .iter()
+        .map(|p| format!("\"{}\"", g1_hex(p)))
+        .collect();
     let vk_json = format!(
         "{{\"alpha\":\"{}\",\"beta\":\"{}\",\"gamma\":\"{}\",\"delta\":\"{}\",\"ic\":[{}]}}",
         g1_hex(&vk.alpha_g1),
@@ -142,5 +149,8 @@ fn withdraw_proof_valid_and_fixture_emitted() {
     std::fs::write(format!("{dir}/vk.json"), &vk_json).unwrap();
     std::fs::write(format!("{dir}/proof.json"), &proof_json).unwrap();
     std::fs::write(format!("{dir}/signals.json"), &signals_json).unwrap();
-    println!("wrote withdraw fixture ({} public inputs) to {dir}/", publics.len());
+    println!(
+        "wrote withdraw fixture ({} public inputs) to {dir}/",
+        publics.len()
+    );
 }
