@@ -1,0 +1,35 @@
+[package]
+name = "shielded-pool"
+version = "0.1.0"
+edition = "2021"
+
+# Phase 1 foundation for confidential (ZK-sealed) gift amounts: the deposit-side
+# primitives of a fixed-denomination shielded pool — an on-chain Poseidon hash
+# and an incremental Merkle tree — plus a testnet cost measurement of a deposit
+# (the #1 new cost risk after Phase 0 settled proof verification). See README.md.
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = "27.0.0"
+# The Phase 0 Groth16 verifier — imported for its `verify` client + proof/vk
+# types, which the pool calls cross-contract to check a withdraw proof.
+groth16-verifier = { path = "../groth16-verifier" }
+
+[dev-dependencies]
+soroban-sdk = { version = "27.0.0", features = ["testutils"] }
+
+# Native-only: an independent field-arithmetic mirror of the on-chain Poseidon,
+# used in tests to prove the BLS12-381 host arithmetic is computed correctly.
+# Never enters the wasm (dev-dependencies compile for the native test build only).
+ark-bls12-381 = { version = "0.4.0", features = ["curve"] }
+ark-ff = "0.4.2"
+# The Phase 2 withdraw circuit — used in the end-to-end test to generate a real
+# proof against the tree the pool builds on-chain. Native-only.
+zk-circuits = { path = "../../zk-circuits" }
+ark-groth16 = "0.4.0"
+ark-snark = "0.4.0"
+ark-ec = "0.4.2"
+ark-std = "0.4.0"
