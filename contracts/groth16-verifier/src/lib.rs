@@ -40,21 +40,21 @@ use soroban_sdk::{
 #[contracttype]
 #[derive(Clone)]
 pub struct VerifyingKey {
-    pub alpha: BytesN<96>,       // G1
-    pub beta: BytesN<192>,       // G2
-    pub gamma: BytesN<192>,      // G2
-    pub delta: BytesN<192>,      // G2
+    pub alpha: BytesN<96>,  // G1
+    pub beta: BytesN<192>,  // G2
+    pub gamma: BytesN<192>, // G2
+    pub delta: BytesN<192>, // G2
     /// IC / gamma_abc: length is (number of public signals) + 1.
-    pub ic: Vec<BytesN<96>>,     // G1[]
+    pub ic: Vec<BytesN<96>>, // G1[]
 }
 
 /// A Groth16 proof: `A` and `C` in G1, `B` in G2.
 #[contracttype]
 #[derive(Clone)]
 pub struct Proof {
-    pub a: BytesN<96>,   // G1
-    pub b: BytesN<192>,  // G2
-    pub c: BytesN<96>,   // G1
+    pub a: BytesN<96>,  // G1
+    pub b: BytesN<192>, // G2
+    pub c: BytesN<96>,  // G1
 }
 
 #[contract]

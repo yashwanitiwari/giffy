@@ -222,8 +222,7 @@ impl ShieldedPool {
 
     /// Current Merkle root (most recent).
     pub fn root(env: Env) -> BytesN<32> {
-        let roots: Vec<BytesN<32>> =
-            env.storage().instance().get(&DataKey::Roots).unwrap();
+        let roots: Vec<BytesN<32>> = env.storage().instance().get(&DataKey::Roots).unwrap();
         roots.get_unchecked(roots.len() - 1)
     }
 

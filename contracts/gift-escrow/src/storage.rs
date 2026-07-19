@@ -14,11 +14,7 @@ fn gift_key(id: u64) -> (Symbol, u64) {
 }
 
 pub fn next_gift_id(env: &Env) -> u64 {
-    let current: u64 = env
-        .storage()
-        .instance()
-        .get(&GIFT_COUNTER)
-        .unwrap_or(0);
+    let current: u64 = env.storage().instance().get(&GIFT_COUNTER).unwrap_or(0);
     let next = current + 1;
     env.storage().instance().set(&GIFT_COUNTER, &next);
     next

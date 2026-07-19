@@ -83,7 +83,9 @@ struct Tree {
 }
 impl Tree {
     fn new() -> Self {
-        Tree { leaves: std::vec![ArkFr::from(0u64); N_LEAVES] }
+        Tree {
+            leaves: std::vec![ArkFr::from(0u64); N_LEAVES],
+        }
     }
     fn set(&mut self, i: usize, v: ArkFr) {
         self.leaves[i] = v;
@@ -113,7 +115,14 @@ impl Tree {
 
 // ---- token helper -----------------------------------------------------------
 
-fn make_token<'a>(env: &Env, admin: &Address) -> (Address, token::StellarAssetClient<'a>, token::TokenClient<'a>) {
+fn make_token<'a>(
+    env: &Env,
+    admin: &Address,
+) -> (
+    Address,
+    token::StellarAssetClient<'a>,
+    token::TokenClient<'a>,
+) {
     let sac = env.register_stellar_asset_contract_v2(admin.clone());
     let addr = sac.address();
     (
@@ -130,9 +139,15 @@ fn on_chain_poseidon_matches_circuit_gadget_native() {
     let client = ShieldedPoolClient::new(&env, &id);
     for (a, b) in [(7u64, 11u64), (0, 0), (1, 999_999)] {
         let got = client
-            .hash(&fr_bytesn(&env, &ArkFr::from(a)), &fr_bytesn(&env, &ArkFr::from(b)))
+            .hash(
+                &fr_bytesn(&env, &ArkFr::from(a)),
+                &fr_bytesn(&env, &ArkFr::from(b)),
+            )
             .to_array();
-        assert_eq!(got, fr_bytesn(&env, &nhash(ArkFr::from(a), ArkFr::from(b))).to_array());
+        assert_eq!(
+            got,
+            fr_bytesn(&env, &nhash(ArkFr::from(a), ArkFr::from(b))).to_array()
+        );
     }
 }
 
@@ -174,17 +189,28 @@ fn deposit_withdraw_end_to_end_and_double_spend_rejected() {
     // Real proof for our note.
     let (circuit, circ_root, nullifier) =
         WithdrawCircuit::assign(secret, siblings, bits, recipient_field);
-    assert_eq!(circ_root, native_root, "circuit root must equal native tree root");
+    assert_eq!(
+        circ_root, native_root,
+        "circuit root must equal native tree root"
+    );
 
     let setup = WithdrawCircuit {
-        root: None, nullifier: None, recipient: None,
-        secret: None, siblings: None, index_bits: None,
+        root: None,
+        nullifier: None,
+        recipient: None,
+        secret: None,
+        siblings: None,
+        index_bits: None,
     };
     let (pk, vk) = Groth16::<Bls12_381>::circuit_specific_setup(setup, &mut rng).unwrap();
     let proof = Groth16::<Bls12_381>::prove(&pk, circuit, &mut rng).unwrap();
 
     // Initialize the pool with the token, denom, verifier, and vk.
-    let config = Config { token: token_addr.clone(), denom, verifier: verifier_id.clone() };
+    let config = Config {
+        token: token_addr.clone(),
+        denom,
+        verifier: verifier_id.clone(),
+    };
     pool.initialize(&config, &to_soroban_vk(&env, &vk));
 
     // Deposit all three commitments in order — the pool builds the tree on-chain.
@@ -194,7 +220,10 @@ fn deposit_withdraw_end_to_end_and_double_spend_rejected() {
     assert_eq!(token.balance(&pool_id), 300);
 
     // The on-chain root must match the root we proved against.
-    assert_eq!(pool.root().to_array(), fr_bytesn(&env, &native_root).to_array());
+    assert_eq!(
+        pool.root().to_array(),
+        fr_bytesn(&env, &native_root).to_array()
+    );
 
     // Withdraw to the recipient with the real proof.
     let root_b = fr_bytesn(&env, &native_root);
@@ -204,7 +233,11 @@ fn deposit_withdraw_end_to_end_and_double_spend_rejected() {
 
     assert_eq!(token.balance(&recipient), 0);
     pool.withdraw(&root_b, &nf_b, &recipient, &rsig_b, &sproof);
-    assert_eq!(token.balance(&recipient), 100, "recipient must receive the denomination");
+    assert_eq!(
+        token.balance(&recipient),
+        100,
+        "recipient must receive the denomination"
+    );
     assert_eq!(token.balance(&pool_id), 200);
 
     // Double-spend: the same nullifier must be rejected.

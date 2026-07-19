@@ -64,7 +64,11 @@ fn sbox(bls: &Bls, x: &Fr) -> Fr {
 /// External (full-round) matrix: `out_i = x_i + Σ x`. Multiplication-free.
 fn ext_mix(bls: &Bls, s0: &Fr, s1: &Fr, s2: &Fr) -> (Fr, Fr, Fr) {
     let sum = bls.fr_add(&bls.fr_add(s0, s1), s2);
-    (bls.fr_add(s0, &sum), bls.fr_add(s1, &sum), bls.fr_add(s2, &sum))
+    (
+        bls.fr_add(s0, &sum),
+        bls.fr_add(s1, &sum),
+        bls.fr_add(s2, &sum),
+    )
 }
 
 /// Internal (partial-round) matrix: `out_i = x_i·d_i + Σ x`. `t` muls.
@@ -73,7 +77,11 @@ fn int_mix(bls: &Bls, d: &Vec<Fr>, s0: &Fr, s1: &Fr, s2: &Fr) -> (Fr, Fr, Fr) {
     let m0 = bls.fr_mul(s0, &d.get_unchecked(0));
     let m1 = bls.fr_mul(s1, &d.get_unchecked(1));
     let m2 = bls.fr_mul(s2, &d.get_unchecked(2));
-    (bls.fr_add(&m0, &sum), bls.fr_add(&m1, &sum), bls.fr_add(&m2, &sum))
+    (
+        bls.fr_add(&m0, &sum),
+        bls.fr_add(&m1, &sum),
+        bls.fr_add(&m2, &sum),
+    )
 }
 
 /// Poseidon2 permutation on a 2-input state, returning `state[0]`.

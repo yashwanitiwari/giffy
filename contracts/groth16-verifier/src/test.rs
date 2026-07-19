@@ -136,14 +136,20 @@ fn make_fixture(env: &Env) -> (VerifyingKey, Proof, Vec<BytesN<32>>, ArkFr) {
     let c = a * b; // public input = 33
 
     let (pk, vk) = Groth16::<Bls12_381>::circuit_specific_setup(
-        MulCircuit { a: Some(a), b: Some(b) },
+        MulCircuit {
+            a: Some(a),
+            b: Some(b),
+        },
         &mut rng,
     )
     .unwrap();
 
     let proof = Groth16::<Bls12_381>::prove(
         &pk,
-        MulCircuit { a: Some(a), b: Some(b) },
+        MulCircuit {
+            a: Some(a),
+            b: Some(b),
+        },
         &mut rng,
     )
     .unwrap();
@@ -181,8 +187,9 @@ fn make_fixture(env: &Env) -> (VerifyingKey, Proof, Vec<BytesN<32>>, ArkFr) {
 fn make_fixture_n(env: &Env, n: usize) -> (VerifyingKey, Proof, Vec<BytesN<32>>) {
     let mut rng = StdRng::seed_from_u64(7);
 
-    let witnesses: std::vec::Vec<(ArkFr, ArkFr)> =
-        (0..n).map(|i| (ArkFr::from(3u64 + i as u64), ArkFr::from(11u64 + i as u64))).collect();
+    let witnesses: std::vec::Vec<(ArkFr, ArkFr)> = (0..n)
+        .map(|i| (ArkFr::from(3u64 + i as u64), ArkFr::from(11u64 + i as u64)))
+        .collect();
     let publics: std::vec::Vec<ArkFr> = witnesses.iter().map(|(a, b)| *a * *b).collect();
 
     let (pk, vk) = Groth16::<Bls12_381>::circuit_specific_setup(
@@ -192,7 +199,10 @@ fn make_fixture_n(env: &Env, n: usize) -> (VerifyingKey, Proof, Vec<BytesN<32>>)
     .unwrap();
     let proof = Groth16::<Bls12_381>::prove(
         &pk,
-        MultiMulCircuit { n, witnesses: Some(witnesses) },
+        MultiMulCircuit {
+            n,
+            witnesses: Some(witnesses),
+        },
         &mut rng,
     )
     .unwrap();

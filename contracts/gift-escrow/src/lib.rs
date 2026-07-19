@@ -1,8 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, panic_with_error, token, Address, Bytes, BytesN, Env, Map,
-    symbol_short,
+    contract, contractimpl, panic_with_error, symbol_short, token, Address, Bytes, BytesN, Env, Map,
 };
 
 mod errors;
@@ -82,7 +81,8 @@ impl GiftEscrowContract {
         token_client.transfer(&contributor, &env.current_contract_address(), &amount);
 
         let existing = gift.contributions.get(contributor.clone()).unwrap_or(0);
-        gift.contributions.set(contributor.clone(), existing + amount);
+        gift.contributions
+            .set(contributor.clone(), existing + amount);
         gift.total_amount += amount;
 
         set_gift(&env, gift_id, &gift);
@@ -180,7 +180,8 @@ impl GiftEscrowContract {
             token_client.transfer(&env.current_contract_address(), &contributor, &amount);
         }
 
-        env.events().publish((symbol_short!("gift_rfnd"), gift_id), ());
+        env.events()
+            .publish((symbol_short!("gift_rfnd"), gift_id), ());
     }
 
     pub fn get_gift(env: Env, gift_id: u64) -> GiftRecord {
