@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Rust / Soroban / circuit build output
+target/
+**/test_snapshots/
+*.rs.bk
+
+# wasm-pack / circuit build output (generated, large binaries).
+# Note: the frontend's checked-in runtime artifacts under frontend/src/wasm/
+# and frontend/public/zk/ are intentionally NOT ignored.
+zk-prover-wasm/pkg/
+*.ptau
+*.r1cs
+*.sym
+*.wtns
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
