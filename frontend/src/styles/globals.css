@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    /* The whole app lives on a photographic background; white text throughout. */
+    color-scheme: dark;
+  }
+
+  body {
+    @apply min-h-screen font-sans text-white antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
