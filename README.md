@@ -12,9 +12,9 @@
 
 **Send crypto the way you'd send an e-gift card — a link, a message, and a claim button. Every gift lives inside one Soroban contract from creation through claim or refund. Optionally, the amount itself never touches the chain in the clear: it's sealed into a zero-knowledge shielded pool and proven, not revealed, at claim time.**
 
-### 🔗 Live Demo
+###  Live Demo
 
-**[▶️ Launch Giffy (Vercel)](https://giffy-chi-coral.vercel.app/)** &nbsp;·&nbsp; **[Backend API (Render)](https://giffy-h3q3.onrender.com)** &nbsp;·&nbsp; **[API Health](https://giffy-h3q3.onrender.com/api/health)**
+**[ Launch Giffy (Vercel)](https://giffy-chi-coral.vercel.app/)** &nbsp;·&nbsp; **[Backend API (Render)](https://giffy-h3q3.onrender.com)** &nbsp;·&nbsp; **[API Health](https://giffy-h3q3.onrender.com/api/health)**
 
 *Live on Stellar **Testnet** — no real funds are handled. Bring a [Freighter](https://freighter.app) wallet switched to Testnet.*
 
