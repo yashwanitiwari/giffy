@@ -1,0 +1,15 @@
+{
+  "name": "zk-prover-wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "zk_prover_wasm_bg.wasm",
+    "zk_prover_wasm.js",
+    "zk_prover_wasm.d.ts"
+  ],
+  "main": "zk_prover_wasm.js",
+  "types": "zk_prover_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
